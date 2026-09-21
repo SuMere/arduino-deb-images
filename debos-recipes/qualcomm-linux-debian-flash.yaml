@@ -703,12 +703,6 @@ actions:
           echo "Skipping board ${board_name}: not in target list"
       fi
 
-      # set skip_board if board dtb isn't present
-      if ! grep -Fxq "$board_dtb" "${dtbs_file}"; then
-          skip_board=true
-          echo "Skipping board ${board_name}: dtb ${board_dtb} not available"
-      fi
-
       # set skip_board if this is a multidtb board but its per-SoC FIT wasn't
       # produced above
       if [ "${board_dtb_bin_type}" = multidtb ] &&
@@ -839,6 +833,10 @@ actions:
               mkfs.vfat -S 4096 -C "${dtb_bin}" 4096
               # extract board device tree from the root filesystem provided
               # tarball
+              if ! grep -Fxq "$board_dtb" "${dtbs_file}"; then
+                  echo "Skipping board ${board_name}: $board_dtb not available in dtbs.tar.gz"
+                  continue
+              fi
               tar -C build -xvf "${ARTIFACTDIR}/dtbs.tar.gz" "$board_dtb"
               # copy into the FAT as combined-dtb.dtb
               mcopy -vmp -i "${dtb_bin}" "build/${board_dtb}" ::/combined-dtb.dtb

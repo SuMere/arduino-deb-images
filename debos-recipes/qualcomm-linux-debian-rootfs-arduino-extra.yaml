@@ -56,6 +56,14 @@ actions:
       echo ventuno-q > /etc/hostname
       # /etc/hosts is created by netbase
       sed -i "1s/^/127.0.1.1	ventuno-q\n/" /etc/hosts
+{{- else if eq $targetboard "shikra"}}
+    description: Set hostname to "shikra"
+    chroot: true
+    command: |
+      set -eux
+      echo shikra > /etc/hostname
+      # /etc/hosts is created by netbase
+      sed -i "1s/^/127.0.1.1	shikra\n/" /etc/hosts
 {{- end }}
 
   - action: run
@@ -140,43 +148,43 @@ actions:
       fi
       EOF
 
-  - action: run
-    description: Customize xfce4 desktop
-    chroot: true
-    command: |
-      set -eux
-      # prevent a xfcedesktop update from overwriting these changes
-      dpkg-divert --local --rename --add /usr/share/backgrounds/xfce/xfce-x.svg
-      # we didn't find a better way then rename our wallpaper with the default xfce one.
-      mv /opt/BackgroundNeutral.jpg /usr/share/backgrounds/xfce/xfce-x.svg
+#  - action: run
+#    description: Customize xfce4 desktop
+#    chroot: true
+#    command: |
+#      set -eux
+#      # prevent a xfcedesktop update from overwriting these changes
+#      dpkg-divert --local --rename --add /usr/share/backgrounds/xfce/xfce-x.svg
+#      # we didn't find a better way then rename our wallpaper with the default xfce one.
+#      mv /opt/BackgroundNeutral.jpg /usr/share/backgrounds/xfce/xfce-x.svg
 
-  - action: run
-    description: Patch lightdm to have a custom login screen
-    chroot: true
-    command: |
-      set -eux
-      mv /opt/NoLogo-BackgroundNeutral.jpg /usr/share/backgrounds/
-      patch /etc/lightdm/lightdm-gtk-greeter.conf \
-            /etc/lightdm/lightdm-greeter.patch \
-      && rm /etc/lightdm/lightdm-greeter.patch
-      mv /etc/lightdm/lightdm.conf.new /etc/lightdm/lightdm.conf
+#  - action: run
+#    description: Patch lightdm to have a custom login screen
+#    chroot: true
+#    command: |
+#      set -eux
+#      mv /opt/NoLogo-BackgroundNeutral.jpg /usr/share/backgrounds/
+#      patch /etc/lightdm/lightdm-gtk-greeter.conf \
+#            /etc/lightdm/lightdm-greeter.patch \
+#      && rm /etc/lightdm/lightdm-greeter.patch
+#      mv /etc/lightdm/lightdm.conf.new /etc/lightdm/lightdm.conf
 
-  - action: run
-    description: Remove workspaces widget and add App Lab to the dock
-    chroot: true
-    command: |
-      set -eux
-      patch /etc/xdg/xfce4/panel/default.xml \
-            /etc/xdg/xfce4/panel/desktop.patch \
-      && rm /etc/xdg/xfce4/panel/desktop.patch
+#  - action: run
+#    description: Remove workspaces widget and add App Lab to the dock
+#    chroot: true
+#    command: |
+#      set -eux
+#      patch /etc/xdg/xfce4/panel/default.xml \
+#            /etc/xdg/xfce4/panel/desktop.patch \
+#      && rm /etc/xdg/xfce4/panel/desktop.patch
 
-  - action: run
-    description: Configure default xfce4 darktheme
-    chroot: true
-    command: |
-       patch /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml \
-             /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml.patch \
-        && rm /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml.patch
+#  - action: run
+#    description: Configure default xfce4 darktheme
+#    chroot: true
+#    command: |
+#       patch /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml \
+#             /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml.patch \
+#        && rm /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml.patch
 
   - action: apt
     description: Install arduino userspace packages
@@ -204,17 +212,17 @@ actions:
 {{- end }}
       - onboard
 
-  - action: run
-    description: Apply Arduino APT pins to arduino-unoq dependencies
-    chroot: true
-    command: |
-      set -eux
-      # re-resolve arduino-unoq's deps so the pins from arduino-unoq-config apply
-      apt-get -y update
-      deps=$(apt-cache depends arduino-{{$targetboard}} | awk '/Depends:/ {print $2}')
-      auto_before=$(apt-mark showauto $deps)
-      apt-get -y --allow-downgrades install $deps
-      [ -n "$auto_before" ] && apt-mark auto $auto_before
+#  - action: run
+#    description: Apply Arduino APT pins to arduino-unoq dependencies
+#    chroot: true
+#    command: |
+#      set -eux
+#      # re-resolve arduino-unoq's deps so the pins from arduino-unoq-config apply
+#      apt-get -y update
+#      deps=$(apt-cache depends arduino-{{$targetboard}} | awk '/Depends:/ {print $2}')
+#      auto_before=$(apt-mark showauto $deps)
+#      apt-get -y --allow-downgrades install $deps
+#      [ -n "$auto_before" ] && apt-mark auto $auto_before
 
   - action: run
     description: Add bash completions
